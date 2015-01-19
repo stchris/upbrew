@@ -13,6 +13,8 @@ import rumps
 
 # status bar message in normal state
 APP_NAME = "upbrew"
+# status bar message while checking for updates
+LOADING_MSG = "checking ..."
 # message we expect from homebrew when no updates are available
 MSG_NO_UPDATES = 'Already up-to-date.\n'
 # how often, in seconds, we check for updates
@@ -43,14 +45,14 @@ class BrewStatusBarApp(rumps.App):
     @rumps.clicked("Check now")
     def check_now(self, _):
         """ manual check handler """
-        self.title = "checking ..."
+        self.title = LOADING_MSG
         self.check()
         self.title = APP_NAME
 
     @rumps.timer(DEFAULT_TIMER_INTERVAL)
     def timer(self, _):
         """ timed check handler """
-        self.title = "checking ..."
+        self.title = LOADING_MSG
         self.check(always_notify=False)
         self.title = APP_NAME
 
