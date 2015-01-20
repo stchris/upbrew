@@ -19,6 +19,8 @@ APP_NAME_WITH_UPDATES = "upbrew*"
 LOADING_MSG = "checking ..."
 # message we expect from homebrew when no updates are available
 MSG_NO_UPDATES = 'Already up-to-date.\n'
+# message to show in the menu when no new updates are available
+MENU_NO_UPDATES = 'No new updates'
 # how often, in seconds, we check for updates
 DEFAULT_TIMER_INTERVAL = 60 * 60
 
@@ -28,6 +30,13 @@ class BrewStatusBarApp(rumps.App):
         super(BrewStatusBarApp, self).__init__(name)
         # store the last output of `brew update` if it's not MSG_NO_UPDATES
         self.last_output = None
+        # build the menu
+        self.menu_check = rumps.MenuItem('Check now')
+        self.menu_updates = rumps.MenuItem(MENU_NO_UPDATES)
+        self.menu = [
+            self.menu_check,
+            self.menu_updates
+        ]
 
     def check(self, always_notify=True):
         """
@@ -41,9 +50,13 @@ class BrewStatusBarApp(rumps.App):
         try:
             res = subprocess.check_output(["brew", "update"])
             if res != MSG_NO_UPDATES:
+                # new updates => store and display
                 self.last_output = res
+                self.menu_updates.title = self.last_output
             else:
+                # no new updates => reset menu to default
                 self.last_output = None
+                self.menu_updates.title = MENU_NO_UPDATES
             notify = (res == MSG_NO_UPDATES and always_notify)
             if notify:
                 rumps.notification(APP_NAME, "", res)

@@ -7,6 +7,8 @@ License: MIT
 Not yet released, don't use it.
 
 TODO:
-* show the last message
-* make it clear when updates are available
+* -show the last message-
+* show a sub-menu of updates (otherwise long messages get truncated)
+* -make it clear when updates are available-
 * add tests
+* get someone to make a pretty logo for it, instead of showing text
