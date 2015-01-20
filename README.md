@@ -9,3 +9,4 @@ Not yet released, don't use it.
 TODO:
 * show the last message
 * make it clear when updates are available
+* add tests
