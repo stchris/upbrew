@@ -13,6 +13,8 @@ import rumps
 
 # status bar message in normal state
 APP_NAME = "upbrew"
+# status bar message when updates are available
+APP_NAME_WITH_UPDATES = "upbrew*"
 # status bar message while checking for updates
 LOADING_MSG = "checking ..."
 # message we expect from homebrew when no updates are available
@@ -24,6 +26,8 @@ DEFAULT_TIMER_INTERVAL = 60 * 60
 class BrewStatusBarApp(rumps.App):
     def __init__(self, name):
         super(BrewStatusBarApp, self).__init__(name)
+        # store the last output of `brew update` if it's not MSG_NO_UPDATES
+        self.last_output = None
 
     def check(self, always_notify=True):
         """
@@ -36,6 +40,10 @@ class BrewStatusBarApp(rumps.App):
         """
         try:
             res = subprocess.check_output(["brew", "update"])
+            if res != MSG_NO_UPDATES:
+                self.last_output = res
+            else:
+                self.last_output = None
             notify = (res == MSG_NO_UPDATES and always_notify)
             if notify:
                 rumps.notification(APP_NAME, "", res)
@@ -47,14 +55,14 @@ class BrewStatusBarApp(rumps.App):
         """ manual check handler """
         self.title = LOADING_MSG
         self.check()
-        self.title = APP_NAME
+        self.title = APP_NAME_WITH_UPDATES if self.last_output else APP_NAME
 
     @rumps.timer(DEFAULT_TIMER_INTERVAL)
     def timer(self, _):
         """ timed check handler """
         self.title = LOADING_MSG
         self.check(always_notify=False)
-        self.title = APP_NAME
+        self.title = APP_NAME_WITH_UPDATES if self.last_output else APP_NAME
 
 
 if __name__ == '__main__':
