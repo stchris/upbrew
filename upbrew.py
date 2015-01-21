@@ -51,12 +51,20 @@ class BrewStatusBarApp(rumps.App):
             res = subprocess.check_output(["brew", "update"])
             if res != MSG_NO_UPDATES:
                 # new updates => store and display
-                self.last_output = res
+                self.last_output = subprocess.check_output(
+                    ["brew", "outdated"]
+                )
                 self.menu_updates.title = self.last_output
             else:
-                # no new updates => reset menu to default
-                self.last_output = None
-                self.menu_updates.title = MENU_NO_UPDATES
+                # no new updates, but let's see if there are previous ones
+                res = subprocess.check_output(["brew", "outdated"])
+                if res:
+                    self.last_output = res
+                    self.menu_updates.title = res
+                else:
+                    # reset menu to default
+                    self.last_output = None
+                    self.menu_updates.title = MENU_NO_UPDATES
             notify = (res == MSG_NO_UPDATES and always_notify)
             if notify:
                 rumps.notification(APP_NAME, "", res)
