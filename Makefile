@@ -11,3 +11,6 @@ clean:
 
 app:
 	python setup.py py2app
+
+pkg:
+	python setup.py bdist_mpkg

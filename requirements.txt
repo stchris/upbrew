@@ -1,3 +1,4 @@
 flake8
 rumps
 pyobjc
+bdist_mpkg
