@@ -21,6 +21,8 @@ LOADING_MSG = "checking ..."
 MSG_NO_UPDATES = 'Already up-to-date.\n'
 # message to show in the menu when no new updates are available
 MENU_NO_UPDATES = 'No new updates'
+# show number of updates message
+MENU_UPDATE_COUNT = 'Updates available: {}'
 # how often, in seconds, we check for updates
 DEFAULT_TIMER_INTERVAL = 60 * 60
 
@@ -54,20 +56,22 @@ class BrewStatusBarApp(rumps.App):
                 self.last_output = subprocess.check_output(
                     ["brew", "outdated"]
                 )
-                self.menu_updates.title = self.last_output
+                self.menu_updates.title = MENU_UPDATE_COUNT.format(
+                    len(self.last_output.split())
+                )
             else:
                 # no new updates, but let's see if there are previous ones
                 res = subprocess.check_output(["brew", "outdated"])
                 if res:
                     self.last_output = res
-                    self.menu_updates.title = res
+                    self.menu_updates.title = MENU_UPDATE_COUNT.format(
+                        len(res.split())
+                    )
                 else:
                     # reset menu to default
                     self.last_output = None
                     self.menu_updates.title = MENU_NO_UPDATES
-            notify = (res == MSG_NO_UPDATES and always_notify)
-            if notify:
-                rumps.notification(APP_NAME, "", res)
+            rumps.notification(APP_NAME, "", res)
         except subprocess.CalledProcessError, e:
             rumps.notification(APP_NAME, "Error", e)
 
